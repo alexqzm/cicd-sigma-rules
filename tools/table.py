@@ -1,7 +1,9 @@
-"""Таблица правил docs/rules.md: уровень, источник событий, ATT&CK, инциденты, OWASP, ГОСТ.
+"""Таблица правил docs/rules.md и матрица сопоставлений с ГОСТ в README.md.
 
-Таблица собирается из правил, сопоставлений mappings/mappings.yml, эталонных событий и
-conversions/. Имена техник ATT&CK берутся из закреплённого файла attack-stix-data.
+Таблица (уровень, источник событий, ATT&CK, инциденты, OWASP, ГОСТ) собирается из правил,
+сопоставлений mappings/mappings.yml, эталонных событий и conversions/; имена техник ATT&CK
+берутся из закреплённого файла attack-stix-data. Матрица «правило × процесс ГОСТ Р 56939-2024»
+пишется в docs/rules.md и в README.md между метками mapping:begin/end.
 
 usage: python -m tools.table --attack enterprise-attack-20.1.json [--atlas DIR] [--check]
   --atlas — клон cps-supply-chain-atlas: проверить, что упомянутые записи атласа существуют
@@ -19,6 +21,8 @@ from .convert import TARGETS
 from .known_issues import KNOWN
 
 OUT = ROOT / "docs" / "rules.md"
+README = ROOT / "README.md"
+BEGIN, END = "<!-- mapping:begin -->", "<!-- mapping:end -->"
 
 OWASP = {
     "CICD-SEC-1": "Insufficient Flow Control Mechanisms",
@@ -50,6 +54,20 @@ GOST = {
 _FOLDER = {("opensearch", "lucene"): "opensearch", ("elasticsearch", "lucene"): "elasticsearch",
            ("elasticsearch", "eql"): "elasticsearch-eql"}
 
+#: краткие названия процессов для схемы (полные — в GOST)
+GOST_SHORT = {
+    "5.4": "управление конфигурацией",
+    "5.9": "экспертиза исходного кода",
+    "5.12": "безопасная система сборки",
+    "5.13": "безопасность сборочной среды",
+    "5.14": "доступ и целостность кода",
+    "5.15": "безопасность секретов",
+    "5.16": "композиционный анализ",
+    "5.17": "вредоносный код в цепочке поставок",
+    "5.20": "безопасный выпуск",
+    "5.21": "безопасная поставка",
+}
+
 LEVEL_RU = {"informational": "инф.", "low": "низкий", "medium": "средний", "high": "высокий",
             "critical": "критический"}
 
@@ -72,16 +90,62 @@ def problems(mappings: dict, atlas: Path | None) -> list[str]:
     rules = mappings.get("rules", {})
     out += [f"нет сопоставления для {k}" for k in sorted(keys - rules.keys())]
     out += [f"сопоставление без правила: {k}" for k in sorted(rules.keys() - keys)]
+    groups = mappings.get("groups", {})
     for key, m in rules.items():
-        if set(m) != {"incidents", "owasp_cicd", "gost_56939"}:
+        if set(m) != {"label", "group", "incidents", "owasp_cicd", "gost_56939"}:
             out.append(f"{key}: поля {sorted(m)}")
             continue
+        if m["group"] not in groups:
+            out.append(f"{key}: неизвестная группа {m['group']}")
         out += [f"{key}: неизвестный риск OWASP {r}" for r in m["owasp_cicd"] if r not in OWASP]
-        out += [f"{key}: нет процесса ГОСТ {p} в справочнике" for p in m["gost_56939"] if p not in GOST]
+        out += [f"{key}: нет процесса ГОСТ {p} в справочнике" for p in m["gost_56939"]
+                if p not in GOST or p not in GOST_SHORT]
         if atlas is not None:
             out += [f"{key}: нет записи атласа {i}" for i in m["incidents"]
                     if not (atlas / "data" / "records" / f"{i}.yaml").is_file()]
     return out
+
+
+def _gost_key(p: str) -> tuple[int, ...]:
+    return tuple(int(x) for x in p.split("."))
+
+
+def matrix(mappings: dict) -> str:
+    """Матрица «правило × процесс ГОСТ Р 56939-2024», правила по группам."""
+    rules = mappings["rules"]
+    used = sorted({p for m in rules.values() for p in m["gost_56939"]}, key=_gost_key)
+    lines = [
+        "| Группа | Правило | " + " | ".join(used) + " |",
+        "|---|---|" + "---|" * len(used),
+    ]
+    for gid, title in mappings["groups"].items():
+        members = [m for m in rules.values() if m["group"] == gid]
+        for i, m in enumerate(members):
+            marks = " | ".join("●" if p in m["gost_56939"] else "" for p in used)
+            lines.append(f"| {title if i == 0 else ''} | {m['label']} | {marks} |")
+    totals = " | ".join(f"**{sum(1 for m in rules.values() if p in m['gost_56939'])}**" for p in used)
+    lines += [
+        f"| | **Правил** | {totals} |",
+        "",
+        "Процессы: " + "; ".join(f"{p} — {GOST_SHORT[p]}" for p in used) + ".",
+    ]
+    return "\n".join(lines)
+
+
+def readme_block(mappings: dict) -> str:
+    return "\n".join([
+        BEGIN,
+        "<!-- генерирует python -m tools.table; вручную не править -->",
+        "",
+        matrix(mappings),
+        "",
+        END,
+    ])
+
+
+def with_readme_block(text: str, mappings: dict) -> str:
+    start, stop = text.index(BEGIN), text.index(END) + len(END)
+    return text[:start] + readme_block(mappings) + text[stop:]
 
 
 def render(names: dict[str, str], mappings: dict) -> str:
@@ -116,8 +180,7 @@ def render(names: dict[str, str], mappings: dict) -> str:
         )
     used_owasp = sorted({r for m in mappings["rules"].values() for r in m["owasp_cicd"]},
                         key=lambda r: int(r.rsplit("-", 1)[1]))
-    used_gost = sorted({p for m in mappings["rules"].values() for p in m["gost_56939"]},
-                       key=lambda p: tuple(int(x) for x in p.split(".")))
+    used_gost = sorted({p for m in mappings["rules"].values() for p in m["gost_56939"]}, key=_gost_key)
     lines = [
         "# Правила",
         "",
@@ -141,6 +204,10 @@ def render(names: dict[str, str], mappings: dict) -> str:
         "",
         *[f"- **{p}** — {GOST[p]}" for p in used_gost],
         "",
+        "## Правила и процессы ГОСТ Р 56939-2024",
+        "",
+        matrix(mappings),
+        "",
     ]
     return "\n".join(lines)
 
@@ -162,13 +229,18 @@ def main(argv: list[str] | None = None) -> int:
     version = next(o["x_mitre_version"] for o in data["objects"] if o["type"] == "x-mitre-collection")
     names["__version__"] = f"ATT&CK {version}"
     text = render(names, mappings)
+    readme_old = README.read_text(encoding="utf-8")
+    readme_new = with_readme_block(readme_old, mappings)
     if args.check:
-        same = OUT.is_file() and OUT.read_text(encoding="utf-8") == text
-        print("docs/rules.md " + ("совпадает" if same else "расходится с правилами"))
-        return 0 if same else 1
+        same_doc = OUT.is_file() and OUT.read_text(encoding="utf-8") == text
+        same_readme = readme_old == readme_new
+        print("docs/rules.md " + ("совпадает" if same_doc else "расходится с правилами"))
+        print("README.md, матрица ГОСТ " + ("совпадает" if same_readme else "расходится с правилами"))
+        return 0 if same_doc and same_readme else 1
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(text, encoding="utf-8")
-    print(f"записано: {OUT.relative_to(ROOT)}")
+    README.write_text(readme_new, encoding="utf-8")
+    print(f"записано: {OUT.relative_to(ROOT)}, {README.relative_to(ROOT)}")
     return 0
 
 

@@ -53,6 +53,20 @@ SQLite, а корреляция вычисляется по спецификац
 на трёх парах `pull_request_target` → `workflow_dispatch`: через 10 минут (near), через 40 минут
 через границу часа (cross) и через 5 часов (far). По Sigma срабатывают near и cross.
 
+```mermaid
+gantt
+    title Пары pull_request_target → workflow_dispatch при окне 1 ч
+    dateFormat HH:mm
+    axisFormat %H:%M
+    todayMarker off
+    section 10 минут
+    near — находят все :done, n1, 09:05, 10m
+    section 40 минут
+    cross — через границу часа, ES|QL не находит :active, c1, 10:40, 40m
+    section 5 часов
+    far — находит только EQL sample :crit, f1, 12:00, 300m
+```
+
 | Бэкенд | Как задано окно | Найдено | Расхождение |
 |---|---|---|---|
 | ES\|QL | фиксированные корзины `date_trunc(1hours, @timestamp)` | near | cross не находится: события в соседних корзинах |

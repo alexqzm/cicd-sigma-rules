@@ -1,5 +1,7 @@
 # Сопоставления правил (ключ — имя файла правила без .yml) — оценка автора.
 #
+# label       — краткое название правила по-русски (схемы и таблицы).
+# group       — группа правил: settings, runs, protect, hosts (см. groups ниже).
 # incidents   — записи атласа cps-supply-chain-atlas (data/records/<id>.yaml), к которым правило
 #               относится: правило ловит шаг или условие атаки, описанные в записи.
 # owasp_cicd  — риски OWASP Top 10 CI/CD Security Risks (CICD-SEC-1 … CICD-SEC-10).
@@ -7,60 +9,93 @@
 #               относится срабатывание или его отсутствие (модель: rbpo-evidence).
 schema: 1
 atlas: https://github.com/alexqzm/cps-supply-chain-atlas
+groups:
+  runs: Запуски рабочих процессов
+  settings: Политики и настройки GitHub Actions
+  protect: Защита веток и выпусков
+  hosts: Сборочные хосты Linux
 rules:
   github_actions_policy_violation:
+    label: Нарушение политики запуска рабочих процессов
+    group: runs
     incidents: [nx-s1ngularity-2025, tanstack-2026]
     owasp_cicd: [CICD-SEC-4, CICD-SEC-1]
     gost_56939: ["5.12", "5.13"]
   github_pull_request_target_run_public_repo:
+    label: Запуск по pull_request_target в публичном репозитории
+    group: runs
     incidents: [nx-s1ngularity-2025, tanstack-2026]
     owasp_cicd: [CICD-SEC-4]
     gost_56939: ["5.13", "5.15"]
   github_pull_request_target_then_workflow_dispatch:
+    label: pull_request_target, затем ручной запуск
+    group: runs
     incidents: [nx-s1ngularity-2025]
     owasp_cicd: [CICD-SEC-4, CICD-SEC-5]
     gost_56939: ["5.13", "5.15", "5.20"]
   github_self_hosted_runner_registered_public_repo:
+    label: Собственный исполнитель в публичном репозитории
+    group: settings
     incidents: []
     owasp_cicd: [CICD-SEC-4, CICD-SEC-7]
     gost_56939: ["5.13"]
   github_runner_group_allows_public_repos:
+    label: Группа исполнителей открыта публичным репозиториям
+    group: settings
     incidents: []
     owasp_cicd: [CICD-SEC-7, CICD-SEC-4]
     gost_56939: ["5.13"]
   github_actions_token_policy_changed:
+    label: Изменены права GITHUB_TOKEN
+    group: settings
     incidents: [nx-s1ngularity-2025]
     owasp_cicd: [CICD-SEC-5]
     gost_56939: ["5.14", "5.15"]
   github_actions_fork_pr_policy_changed:
+    label: Изменены политики запуска из форков
+    group: settings
     incidents: []
     owasp_cicd: [CICD-SEC-4, CICD-SEC-1]
     gost_56939: ["5.13", "5.14"]
   github_actions_allowed_actions_policy_changed:
+    label: Изменён список разрешённых действий
+    group: settings
     incidents: [tj-actions-2025]
     owasp_cicd: [CICD-SEC-3, CICD-SEC-8]
     gost_56939: ["5.12", "5.17"]
   github_immutable_releases_disabled:
+    label: Отключены неизменяемые выпуски
+    group: protect
     incidents: [tj-actions-2025]
     owasp_cicd: [CICD-SEC-9]
     gost_56939: ["5.20", "5.21"]
   github_protection_removed:
+    label: Снята защита ветки, набора правил или развёртывания
+    group: protect
     incidents: []
     owasp_cicd: [CICD-SEC-1]
     gost_56939: ["5.4", "5.14"]
   github_branch_protection_overridden:
+    label: Обход защиты ветки
+    group: protect
     incidents: []
     owasp_cicd: [CICD-SEC-1]
     gost_56939: ["5.9", "5.14"]
   proc_creation_lnx_runner_secret_marker_search:
+    label: Поиск маркеров секретов исполнителя
+    group: hosts
     incidents: [tj-actions-2025]
     owasp_cicd: [CICD-SEC-3, CICD-SEC-6]
     gost_56939: ["5.13", "5.15"]
   proc_creation_lnx_node_ai_cli_permission_bypass:
+    label: Node.js запускает ИИ-ассистента без подтверждений
+    group: hosts
     incidents: [nx-s1ngularity-2025]
     owasp_cicd: [CICD-SEC-3]
     gost_56939: ["5.16", "5.17"]
   proc_creation_lnx_ai_cli_permission_bypass:
+    label: ИИ-ассистент без подтверждений (поиск угроз)
+    group: hosts
     incidents: [nx-s1ngularity-2025]
     owasp_cicd: [CICD-SEC-3]
     gost_56939: ["5.13", "5.17"]
