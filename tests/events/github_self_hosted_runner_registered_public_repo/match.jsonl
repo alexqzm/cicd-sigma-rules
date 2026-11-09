@@ -1,0 +1,1 @@
+{"_test": "runner registered to a public repository", "@timestamp": 1793610060000, "_document_id": "CfUvM8C_cCwXIZsOKTqion", "action": "repo.register_self_hosted_runner", "actor": "alice", "actor_id": 1000001, "org": "example-org", "org_id": 90000001, "repo": "example-org/web", "repo_id": 70000002, "public_repo": true}

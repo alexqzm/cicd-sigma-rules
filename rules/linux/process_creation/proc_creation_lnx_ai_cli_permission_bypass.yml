@@ -1,0 +1,40 @@
+title: AI Coding CLI Launched With Permission Bypass Flag
+id: 0941b2d8-90a6-4bb0-8952-2937143e48bb
+related:
+    - id: a77e4b0d-03bd-4471-a720-40ebf1d39067
+      type: similar
+status: experimental
+description: |
+    Detects an AI coding assistant CLI launched with a flag that turns off its permission prompts: claude with
+    --dangerously-skip-permissions, gemini with --yolo, or q chat with --trust-all-tools, whatever the parent process.
+    These are the flags used by the malicious postinstall script of compromised Nx packages (s1ngularity, 2025).
+    Hunting rule: on build hosts and CI runners such launches deserve review; on developer workstations they are
+    often intentional.
+references:
+    - https://nx.dev/blog/s1ngularity-postmortem
+    - https://snyk.io/blog/weaponizing-ai-coding-agents-for-malware-in-the-nx-malicious-package/
+author: Alexander Kuzmin
+date: 2026-11-09
+tags:
+    - attack.execution
+    - attack.t1204.005
+    - attack.credential-access
+    - attack.t1552.001
+logsource:
+    product: linux
+    category: process_creation
+detection:
+    selection_cli_claude:
+        CommandLine|contains|all:
+            - 'claude'
+            - '--dangerously-skip-permissions'
+    selection_cli_gemini:
+        CommandLine|contains|all:
+            - 'gemini'
+            - '--yolo'
+    selection_cli_q:
+        CommandLine|contains: '--trust-all-tools'
+    condition: 1 of selection_cli_*
+falsepositives:
+    - Developers intentionally running AI agents without permission prompts, for example in containers or virtual machines.
+level: low

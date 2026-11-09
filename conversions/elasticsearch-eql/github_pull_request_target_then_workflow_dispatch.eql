@@ -1,0 +1,3 @@
+sequence by repo with maxspan=1h 
+ [any where action:"workflows.created_workflow_run" and event:"pull_request_target"] 
+ [any where action:"workflows.created_workflow_run" and event:"workflow_dispatch"] by  with runs=2

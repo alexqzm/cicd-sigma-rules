@@ -1,0 +1,2 @@
+{"_test": "organization allowed actions policy changed", "@timestamp": 1793610060000, "_document_id": "DJwJJhRwM0bIBe2IzYB8XM", "action": "org.update_actions_settings", "actor": "alice", "actor_id": 1000001, "org": "example-org", "org_id": 90000001}
+{"_test": "repository allowed actions policy changed", "@timestamp": 1793610120000, "_document_id": "EkNIo6U-G1xm_0KMUKJ0s7", "action": "repo.update_actions_settings", "actor": "alice", "actor_id": 1000001, "org": "example-org", "org_id": 90000001, "repo": "example-org/firmware", "repo_id": 70000001, "public_repo": false}

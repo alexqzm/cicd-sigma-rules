@@ -1,0 +1,30 @@
+title: GitHub Actions Allowed Actions Policy Changed
+id: 78c24844-953b-4df0-aa4f-03399bfbc6be
+status: experimental
+description: |
+    Detects a change of the GitHub Actions policy settings of an organization or a repository.
+    The event records the old and the new policy and changes of the allowed types, of the GitHub-owned and
+    verified-creator flags and of the allowed patterns, that is, of which third-party actions and reusable workflows
+    a workflow may run. In the tj-actions/changed-files compromise (2025) tags of a widely used third-party action
+    were re-pointed to a malicious commit. The rule reports every change.
+references:
+    - https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/audit-log-events-for-your-organization
+    - https://github.com/advisories/GHSA-mrrh-fwg8-r2c3
+author: Alexander Kuzmin
+date: 2026-11-09
+tags:
+    - attack.defense-impairment
+    - attack.t1685
+logsource:
+    product: github
+    service: audit
+    definition: 'Requirements: GitHub organization or enterprise audit log events (audit log streaming, REST API or JSON export) with the documented field names'
+detection:
+    selection:
+        action:
+            - 'org.update_actions_settings'
+            - 'repo.update_actions_settings'
+    condition: selection
+falsepositives:
+    - Approved additions to the allowlist of actions and other administrative changes.
+level: low

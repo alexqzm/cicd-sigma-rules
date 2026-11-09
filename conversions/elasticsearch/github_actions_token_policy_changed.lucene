@@ -1,0 +1,1 @@
+action:(org.set_default_workflow_permissions OR repo.set_default_workflow_permissions OR org.set_workflow_permission_can_approve_pr OR repo.set_workflow_permission_can_approve_pr)

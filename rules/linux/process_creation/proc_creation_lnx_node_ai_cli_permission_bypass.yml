@@ -1,0 +1,47 @@
+title: Node.js Process Launching AI Coding CLI With Permission Bypass Flag
+id: a77e4b0d-03bd-4471-a720-40ebf1d39067
+related:
+    - id: 0941b2d8-90a6-4bb0-8952-2937143e48bb
+      type: similar
+    - id: f0025a69-e1b7-4dda-a53c-db21fa2d4071
+      type: similar
+status: experimental
+description: |
+    Detects a Node.js or Bun process launching an AI coding assistant CLI with a flag that turns off its permission
+    prompts: claude with --dangerously-skip-permissions, gemini with --yolo, or q chat with --trust-all-tools.
+    The malicious postinstall script (telemetry.js) of compromised Nx packages (s1ngularity, 2025) searched the host
+    for sensitive data and invoked locally installed AI CLIs with exactly these flags. A package script that drives
+    a local AI agent without permission prompts is a strong sign of a malicious dependency.
+references:
+    - https://nx.dev/blog/s1ngularity-postmortem
+    - https://snyk.io/blog/weaponizing-ai-coding-agents-for-malware-in-the-nx-malicious-package/
+author: Alexander Kuzmin
+date: 2026-11-09
+tags:
+    - attack.execution
+    - attack.t1204.005
+    - attack.credential-access
+    - attack.t1552.001
+logsource:
+    product: linux
+    category: process_creation
+detection:
+    selection_parent:
+        ParentImage|endswith:
+            - '/node'
+            - '/nodejs'
+            - '/bun'
+    selection_cli_claude:
+        CommandLine|contains|all:
+            - 'claude'
+            - '--dangerously-skip-permissions'
+    selection_cli_gemini:
+        CommandLine|contains|all:
+            - 'gemini'
+            - '--yolo'
+    selection_cli_q:
+        CommandLine|contains: '--trust-all-tools'
+    condition: selection_parent and 1 of selection_cli_*
+falsepositives:
+    - Agent orchestration tools written in Node.js that deliberately run an AI CLI without permission prompts, for example inside a disposable sandbox.
+level: high

@@ -1,0 +1,33 @@
+title: GitHub Actions Fork Pull Request Workflow Policy Changed
+id: 31c398bf-588d-4e81-b29d-231eafc681f1
+status: experimental
+description: |
+    Detects a change of the policies that govern workflows from fork pull requests: approval required for
+    workflows from public forks, approval for fork pull request workflows from collaborators without write access
+    to private repositories, and the policy for workflows on private repository forks.
+    These policies decide whether code from a fork runs in the pipeline without a maintainer's approval.
+    The rule reports every change, because the values of the policy fields are not documented.
+references:
+    - https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/audit-log-events-for-your-organization
+author: Alexander Kuzmin
+date: 2026-11-09
+tags:
+    - attack.defense-impairment
+    - attack.t1685
+logsource:
+    product: github
+    service: audit
+    definition: 'Requirements: GitHub organization or enterprise audit log events (audit log streaming, REST API or JSON export) with the documented field names'
+detection:
+    selection:
+        action:
+            - 'org.set_actions_fork_pr_approvals_policy'
+            - 'repo.set_actions_fork_pr_approvals_policy'
+            - 'org.set_actions_private_fork_pr_approvals_policy'
+            - 'repo.set_actions_private_fork_pr_approvals_policy'
+            - 'org.set_fork_pr_workflows_policy'
+            - 'repo.set_fork_pr_workflows_policy'
+    condition: selection
+falsepositives:
+    - Approved administrative changes, including tightening of the policy.
+level: low

@@ -1,0 +1,34 @@
+title: GitHub Actions Run Triggered by pull_request_target in Public Repository
+id: d148bbbc-0578-49e6-96f0-72828a06b552
+status: experimental
+description: |
+    Detects a workflow run triggered by pull_request_target in a public repository.
+    Such a job receives the base repository's GITHUB_TOKEN and access to repository and organization secrets,
+    while the pull request can come from any fork. A workflow that checks out and runs the pull request code
+    ("pwn request") or interpolates pull request text into commands hands these privileges to the author of the
+    pull request. In the Nx (s1ngularity, 2025) and TanStack (2026) incidents the attack started in a
+    pull_request_target workflow. GitHub's default policy blocks pull_request_target in public repositories without
+    an applicable event policy and is enforced from 2026-12-02; after that date such runs mean that an event
+    policy explicitly allows the trigger.
+references:
+    - https://docs.github.com/en/actions/reference/security/securely-using-pull_request_target
+    - https://nx.dev/blog/s1ngularity-postmortem
+    - https://tanstack.com/blog/incident-followup
+author: Alexander Kuzmin
+date: 2026-11-09
+tags:
+    - attack.execution
+    - attack.t1677
+logsource:
+    product: github
+    service: audit
+    definition: 'Requirements: GitHub organization or enterprise audit log events (audit log streaming, REST API or JSON export) with the documented field names; workflows.created_workflow_run is not shown in the web interface'
+detection:
+    selection:
+        action: 'workflows.created_workflow_run'
+        event: 'pull_request_target'
+        public_repo: true
+    condition: selection
+falsepositives:
+    - Workflows that use pull_request_target for labeling, triage or status checks without running pull request code.
+level: low

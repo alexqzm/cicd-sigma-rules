@@ -1,0 +1,31 @@
+title: GitHub Immutable Releases Disabled or Policy Changed
+id: 5917a8a5-7f9e-4d99-8f01-7b2952c22081
+status: experimental
+description: |
+    Detects disabling of immutable releases for a repository and changes of the organization policy for
+    immutable releases. With immutable releases the Git tag of a published release cannot be moved or deleted
+    and its assets cannot be modified, and each release gets a release attestation. Disabling them makes
+    tags movable again: in the tj-actions/changed-files compromise (2025) version tags of an action were
+    retroactively re-pointed to a malicious commit.
+references:
+    - https://docs.github.com/en/code-security/concepts/supply-chain-security/immutable-releases
+    - https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/audit-log-events-for-your-organization
+    - https://github.com/advisories/GHSA-mrrh-fwg8-r2c3
+author: Alexander Kuzmin
+date: 2026-11-09
+tags:
+    - attack.defense-impairment
+    - attack.t1685
+logsource:
+    product: github
+    service: audit
+    definition: 'Requirements: GitHub organization or enterprise audit log events (audit log streaming, REST API or JSON export) with the documented field names'
+detection:
+    selection:
+        action:
+            - 'repo.immutable_releases_settings_disabled'
+            - 'org.update_immutable_releases_settings_policy'
+    condition: selection
+falsepositives:
+    - Approved changes; the organization policy event is also logged when the policy is tightened (compare old_policy and new_policy).
+level: medium

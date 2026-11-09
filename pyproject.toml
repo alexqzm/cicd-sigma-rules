@@ -1,0 +1,13 @@
+[project]
+name = "cicd-sigma-rules"
+version = "0.1.0"
+description = "Sigma rules for attacks on CI/CD pipelines and the software supply chain, with reference events"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.11"
+authors = [{ name = "Alexander Kuzmin" }]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-ra"

@@ -1,0 +1,1 @@
+any where action:"repo.register_self_hosted_runner" and public_repo:true

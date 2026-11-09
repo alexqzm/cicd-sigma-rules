@@ -1,0 +1,2 @@
+{"_test": "fork pull request approval policy changed (other rule)", "@timestamp": 1793610300000, "_document_id": "h6zMXBWFtieUwlDAYb4FGn", "action": "org.set_actions_fork_pr_approvals_policy", "actor": "alice", "actor_id": 1000001, "org": "example-org", "org_id": 90000001}
+{"_test": "Actions settings changed (other rule)", "@timestamp": 1793610360000, "_document_id": "1bDM5yKJ95lWwWtL816wTK", "action": "org.update_actions_settings", "actor": "alice", "actor_id": 1000001, "org": "example-org", "org_id": 90000001}

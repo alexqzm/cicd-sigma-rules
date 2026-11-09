@@ -1,0 +1,1 @@
+action IN ("org.set_actions_fork_pr_approvals_policy", "repo.set_actions_fork_pr_approvals_policy", "org.set_actions_private_fork_pr_approvals_policy", "repo.set_actions_private_fork_pr_approvals_policy", "org.set_fork_pr_workflows_policy", "repo.set_fork_pr_workflows_policy")

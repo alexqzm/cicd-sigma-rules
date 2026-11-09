@@ -1,0 +1,1 @@
+action="repo.register_self_hosted_runner" public_repo=true

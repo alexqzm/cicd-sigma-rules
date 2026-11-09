@@ -1,0 +1,29 @@
+title: GitHub Actions Workflow Execution Protection Violation
+id: 1945a19c-58a6-4306-89ce-3352ccd8a827
+status: experimental
+description: |
+    Detects a workflow run that produced violations of a GitHub Actions workflow execution protection policy.
+    Execution protections restrict which actors and which events may trigger workflows; GitHub names poisoned
+    pipeline execution from pull requests via pull_request_target and abuse of manual triggers among the attack
+    patterns they disrupt. A violation means that an actor or an event outside the allowlist tried to start a workflow.
+references:
+    - https://docs.github.com/en/actions/concepts/about-actions-policies
+    - https://docs.github.com/en/actions/reference/security/securely-using-pull_request_target
+    - https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/audit-log-events-for-your-organization
+author: Alexander Kuzmin
+date: 2026-11-09
+tags:
+    - attack.execution
+    - attack.t1677
+logsource:
+    product: github
+    service: audit
+    definition: 'Requirements: GitHub organization or enterprise audit log events (audit log streaming, REST API or JSON export) with the documented field names'
+detection:
+    selection:
+        action: 'workflows.actions_policy_violation'
+    condition: selection
+falsepositives:
+    - Legitimate workflows not yet covered by a newly introduced policy.
+    - Runs that only violate policies in evaluate mode, including the default pull_request_target policy for public repositories (evaluate mode until enforcement on 2026-12-02), if such violations are logged; the event documentation does not say. The allowed field of the event may tell them apart.
+level: medium

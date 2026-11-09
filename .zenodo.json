@@ -1,0 +1,45 @@
+{
+  "title": "cicd-sigma-rules: правила Sigma для атак на конвейеры сборки и цепочку поставки ПО",
+  "upload_type": "software",
+  "version": "0.1.0",
+  "language": "rus",
+  "license": "apache-2.0",
+  "creators": [
+    {
+      "name": "Kuzmin, Alexander",
+      "orcid": "0000-0002-0393-412X"
+    }
+  ],
+  "description": "<p>Правила Sigma для обнаружения атак на конвейеры сборки и цепочку поставки ПО по журналу аудита GitHub (политики выполнения рабочих процессов, pull_request_target, собственные исполнители, политики токена и форков, неизменяемые выпуски, защита веток) и по созданию процессов на сборочных хостах Linux (поиск секретов в памяти исполнителя, ИИ-ассистенты с отключёнными подтверждениями). Правила сопоставлены с инцидентами атласа cps-supply-chain-atlas, рисками OWASP Top 10 CI/CD и процессами ГОСТ Р 56939-2024.</p><p>Проверка: валидаторы pySigma с закреплённой MITRE ATT&amp;CK 20.1; каталог задокументированных событий и полей GitHub; 85 синтетических эталонных событий, исполняемых SQL-запросами бэкенда pySigma для SQLite, и корреляции по спецификации Sigma; мутационная проверка; исполнение сгенерированных запросов Lucene и EQL в OpenSearch 3.8.0 и Elasticsearch 9.5.5 в CI. Найдены дефекты бэкенда EQL (логические поля, хвост корреляции temporal_ordered) и расхождения семантики корреляций между бэкендами.</p>",
+  "keywords": [
+    "Sigma",
+    "detection engineering",
+    "SIEM",
+    "CI/CD security",
+    "GitHub Actions",
+    "software supply chain",
+    "OpenSearch",
+    "Elasticsearch",
+    "evidence graph"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/alexqzm/cicd-sigma-rules",
+      "relation": "isSupplementTo",
+      "resource_type": "software",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://github.com/alexqzm/cps-supply-chain-atlas",
+      "relation": "references",
+      "resource_type": "dataset",
+      "scheme": "url"
+    },
+    {
+      "identifier": "10.5281/zenodo.23833592",
+      "relation": "references",
+      "resource_type": "software",
+      "scheme": "doi"
+    }
+  ]
+}

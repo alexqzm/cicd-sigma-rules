@@ -1,0 +1,1 @@
+any where (action like~ ("org.runner_group_created", "org.runner_group_updated")) and runner_group_allow_public:true

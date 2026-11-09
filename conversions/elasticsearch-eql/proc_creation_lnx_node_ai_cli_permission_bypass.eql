@@ -1,0 +1,1 @@
+any where (ParentImage like~ ("*/node", "*/nodejs", "*/bun")) and ((CommandLine:"*claude*" and CommandLine:"*--dangerously-skip-permissions*") or (CommandLine:"*gemini*" and CommandLine:"*--yolo*") or CommandLine:"*--trust-all-tools*")

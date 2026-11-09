@@ -1,0 +1,1 @@
+action:(org.set_actions_fork_pr_approvals_policy OR repo.set_actions_fork_pr_approvals_policy OR org.set_actions_private_fork_pr_approvals_policy OR repo.set_actions_private_fork_pr_approvals_policy OR org.set_fork_pr_workflows_policy OR repo.set_fork_pr_workflows_policy)

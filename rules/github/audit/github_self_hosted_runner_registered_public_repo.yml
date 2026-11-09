@@ -1,0 +1,31 @@
+title: GitHub Self-Hosted Runner Registered to Public Repository
+id: b9cf39f4-44ec-4f52-8755-adb193e20cd7
+related:
+    - id: f8ed0e8f-7438-4b79-85eb-f358ef2fbebd
+      type: similar
+status: experimental
+description: |
+    Detects registration of a self-hosted runner to a public repository.
+    GitHub recommends using self-hosted runners only with private repositories, because forks of a public
+    repository can run code on the runner machine by opening a pull request that executes it in a workflow.
+    This narrows the SigmaHQ rule for any self-hosted runner change down to public repositories.
+references:
+    - https://docs.github.com/en/actions/reference/security/secure-use
+    - https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/audit-log-events-for-your-organization
+author: Alexander Kuzmin
+date: 2026-11-09
+tags:
+    - attack.execution
+    - attack.t1677
+logsource:
+    product: github
+    service: audit
+    definition: 'Requirements: GitHub organization or enterprise audit log events (audit log streaming, REST API or JSON export) with the documented field names'
+detection:
+    selection:
+        action: 'repo.register_self_hosted_runner'
+        public_repo: true
+    condition: selection
+falsepositives:
+    - Public repositories that deliberately run trusted jobs on isolated, ephemeral self-hosted runners and require approval for fork pull requests.
+level: medium

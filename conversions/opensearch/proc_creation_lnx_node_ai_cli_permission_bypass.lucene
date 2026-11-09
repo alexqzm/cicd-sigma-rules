@@ -1,0 +1,1 @@
+(ParentImage:(*\/node OR *\/nodejs OR *\/bun)) AND ((CommandLine:*claude* AND CommandLine:*\-\-dangerously\-skip\-permissions*) OR (CommandLine:*gemini* AND CommandLine:*\-\-yolo*) OR CommandLine:*\-\-trust\-all\-tools*)

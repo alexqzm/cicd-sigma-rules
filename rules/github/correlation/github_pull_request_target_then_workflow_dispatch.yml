@@ -1,0 +1,75 @@
+title: GitHub Actions Run Triggered by pull_request_target
+id: eda44f08-5e0e-4741-b8fb-5ac1766ae137
+name: github_workflow_run_pull_request_target
+status: experimental
+description: Base rule of the correlation in this file. A workflow run triggered by pull_request_target.
+references:
+    - https://docs.github.com/en/actions/reference/security/securely-using-pull_request_target
+author: Alexander Kuzmin
+date: 2026-11-09
+logsource:
+    product: github
+    service: audit
+    definition: 'Requirements: GitHub organization or enterprise audit log events (audit log streaming, REST API or JSON export) with the documented field names'
+detection:
+    selection:
+        action: 'workflows.created_workflow_run'
+        event: 'pull_request_target'
+    condition: selection
+falsepositives:
+    - Base rule, not intended to alert on its own.
+level: informational
+---
+title: GitHub Actions Run Triggered by workflow_dispatch
+id: 2d3fa26a-7cd1-401d-8c2e-1cf5afed9a85
+name: github_workflow_run_workflow_dispatch
+status: experimental
+description: Base rule of the correlation in this file. A manually dispatched workflow run (workflow_dispatch).
+references:
+    - https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows
+author: Alexander Kuzmin
+date: 2026-11-09
+logsource:
+    product: github
+    service: audit
+    definition: 'Requirements: GitHub organization or enterprise audit log events (audit log streaming, REST API or JSON export) with the documented field names'
+detection:
+    selection:
+        action: 'workflows.created_workflow_run'
+        event: 'workflow_dispatch'
+    condition: selection
+falsepositives:
+    - Base rule, not intended to alert on its own.
+level: informational
+---
+title: GitHub Actions pull_request_target Run Followed by workflow_dispatch Run
+id: 65c8f9cd-e58e-4c12-83fd-c45a48790b80
+status: experimental
+description: |
+    Detects a workflow run triggered by pull_request_target followed within one hour by a manually dispatched
+    workflow run in the same repository. A pull_request_target job receives the base repository's GITHUB_TOKEN,
+    and workflow_dispatch events triggered with GITHUB_TOKEN still create workflow runs, so code that gains control
+    of such a job can start other workflows of the repository, including publishing ones. In the Nx incident
+    (s1ngularity, 2025) a pull_request_target workflow that echoed the pull request title without sanitization,
+    write permissions of workflows and a publishing workflow that allowed manual dispatch together led to the theft
+    of the npm publishing token. The one-hour window is a parameter of the rule, not a property of the incident.
+references:
+    - https://nx.dev/blog/s1ngularity-postmortem
+    - https://docs.github.com/en/actions/reference/security/securely-using-pull_request_target
+    - https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows
+author: Alexander Kuzmin
+date: 2026-11-09
+tags:
+    - attack.execution
+    - attack.t1677
+correlation:
+    type: temporal_ordered
+    rules:
+        - github_workflow_run_pull_request_target
+        - github_workflow_run_workflow_dispatch
+    group-by:
+        - repo
+    timespan: 1h
+falsepositives:
+    - Maintainers dispatching workflows manually shortly after automated pull_request_target runs such as labeling or triage.
+level: low

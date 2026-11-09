@@ -1,0 +1,33 @@
+title: GitHub Runner Group Opened to Public Repositories
+id: 38777fb4-f8ec-4d6c-bfa3-f5d463c4bbed
+related:
+    - id: f8ed0e8f-7438-4b79-85eb-f358ef2fbebd
+      type: similar
+status: experimental
+description: |
+    Detects creation or update of a self-hosted runner group that public repositories are allowed to use.
+    For security reasons public repositories cannot use runners of a runner group by default; the setting
+    overrides this default and exposes the group's runners to code from fork pull requests of public repositories.
+references:
+    - https://docs.github.com/en/actions/how-tos/manage-runners/self-hosted-runners/manage-access
+    - https://docs.github.com/en/actions/reference/security/secure-use
+author: Alexander Kuzmin
+date: 2026-11-09
+tags:
+    - attack.defense-impairment
+    - attack.t1685
+logsource:
+    product: github
+    service: audit
+    definition: 'Requirements: GitHub organization or enterprise audit log events (audit log streaming, REST API or JSON export) with the documented field names'
+detection:
+    selection:
+        action:
+            - 'org.runner_group_created'
+            - 'org.runner_group_updated'
+        runner_group_allow_public: true
+    condition: selection
+falsepositives:
+    - Runner groups of isolated, ephemeral runners intended for public repositories.
+    - Updates of other settings of a group that already allows public repositories, if the event carries the current value of the setting rather than the change.
+level: medium

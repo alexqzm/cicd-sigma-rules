@@ -1,0 +1,32 @@
+# Сопоставление полей журнала аудита GitHub с полями нормализованного события KUMA — предложение
+# автора, в KUMA не проверено. Нормализатор KUMA для событий GitHub должен заполнять те же поля:
+# DeviceVendor = GitHub, DeviceProduct = Audit log, остальные — по таблице в docs/kuma.md.
+# Поля DeviceCustomString в KUMA строковые, а логические значения правил (public_repo: true)
+# pySigma в строки не переводит (convert_type переводит только числа): проверьте, что условие на
+# такие поля в KUMA сравнивает со строкой 'true'.
+name: GitHub audit log fields for KUMA (proposed, not verified in KUMA)
+priority: 20
+transformations:
+  - id: kuma_github_audit_source
+    type: add_condition
+    conditions:
+      DeviceVendor: GitHub
+      DeviceProduct: Audit log
+    rule_conditions:
+      - type: logsource
+        product: github
+        service: audit
+  - id: kuma_github_audit_fields
+    type: field_name_mapping
+    mapping:
+      action: DeviceAction
+      actor: SourceUserName
+      repo: DeviceCustomString1
+      event: DeviceCustomString2
+      public_repo: DeviceCustomString3
+      runner_group_allow_public: DeviceCustomString4
+      org: DeviceCustomString5
+    rule_conditions:
+      - type: logsource
+        product: github
+        service: audit

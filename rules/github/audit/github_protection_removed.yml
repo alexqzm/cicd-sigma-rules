@@ -1,0 +1,29 @@
+title: GitHub Branch Protection, Ruleset or Deployment Protection Rule Removed
+id: 8bb3e9dd-ad86-4d7a-ace6-f54fd8ad960f
+status: experimental
+description: |
+    Detects removal of controls that guard what reaches release branches and deployments: branch protection
+    disabled on a branch, a repository ruleset deleted, or a deployment protection rule of an environment deleted
+    via the API. Without them changes can reach protected branches or deployment jobs without the required reviews
+    and checks.
+references:
+    - https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/audit-log-events-for-your-organization
+author: Alexander Kuzmin
+date: 2026-11-09
+tags:
+    - attack.defense-impairment
+    - attack.t1685
+logsource:
+    product: github
+    service: audit
+    definition: 'Requirements: GitHub organization or enterprise audit log events (audit log streaming, REST API or JSON export) with the documented field names'
+detection:
+    selection:
+        action:
+            - 'protected_branch.destroy'
+            - 'repository_ruleset.destroy'
+            - 'environment.remove_protection_rule'
+    condition: selection
+falsepositives:
+    - Approved restructuring of protections, for example replacing branch protection with a ruleset.
+level: medium

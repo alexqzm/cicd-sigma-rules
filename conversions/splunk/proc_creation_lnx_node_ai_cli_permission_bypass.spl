@@ -1,0 +1,1 @@
+ParentImage IN ("*/node", "*/nodejs", "*/bun") (CommandLine="*claude*" CommandLine="*--dangerously-skip-permissions*") OR (CommandLine="*gemini*" CommandLine="*--yolo*") OR CommandLine="*--trust-all-tools*"

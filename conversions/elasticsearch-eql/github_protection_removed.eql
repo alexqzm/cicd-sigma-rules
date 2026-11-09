@@ -1,0 +1,1 @@
+any where action like~ ("protected_branch.destroy", "repository_ruleset.destroy", "environment.remove_protection_rule")

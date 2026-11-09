@@ -1,0 +1,25 @@
+title: GitHub Branch Protection Requirement Overridden
+id: fe985c84-8592-4699-af7f-f279daa47bf9
+status: experimental
+description: |
+    Detects a branch protection requirement overridden by a repository administrator. The event carries the
+    branch, the commits before and after the change and the codes and reasons of the overridden requirements, so
+    the alert shows which commit reached a protected branch past its checks.
+references:
+    - https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/audit-log-events-for-your-organization
+author: Alexander Kuzmin
+date: 2026-11-09
+tags:
+    - attack.defense-impairment
+    - attack.t1685
+logsource:
+    product: github
+    service: audit
+    definition: 'Requirements: GitHub organization or enterprise audit log events (audit log streaming, REST API or JSON export) with the documented field names'
+detection:
+    selection:
+        action: 'protected_branch.policy_override'
+    condition: selection
+falsepositives:
+    - Emergency fixes merged by administrators under an approved procedure.
+level: medium

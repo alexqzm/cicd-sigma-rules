@@ -1,0 +1,1 @@
+(action:(org.runner_group_created OR org.runner_group_updated)) AND runner_group_allow_public:true
